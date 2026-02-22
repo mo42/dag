@@ -196,22 +196,23 @@ int cmd_compile(const fs::path& dir) {
       return 1;
 
     std::string duckdb_libs;
-    for (auto& dir : {"../duckdb/build/release/src", "../duckdb/extensions", "../duckdb/build/release/third_party"}) {
-        if (fs::exists(dir)) {
-            for (auto& e : fs::recursive_directory_iterator(dir)) {
-                if (e.path().extension() == ".a") {
-                    duckdb_libs += " " + e.path().string();
-                }
-            }
+    for (auto& dir :
+         {"../duckdb/build/release/src", "../duckdb/build/release/extension",
+          "../duckdb/build/release/third_party"}) {
+      if (fs::exists(dir)) {
+        for (auto& e : fs::recursive_directory_iterator(dir)) {
+          if (e.path().extension() == ".a") {
+            duckdb_libs += " " + e.path().string();
+          }
         }
+      }
     }
 
-    std::string lib_group = "-Wl,--start-group " + duckdb_libs + " -Wl,--end-group";
+    std::string lib_group =
+        "-Wl,--start-group " + duckdb_libs + " -Wl,--end-group";
     std::string compile_cmd = "g++ " + name + ".cpp -o " + name +
-                              " -I../duckdb/src/include" +
-                              " " + lib_group +
-                              " -lssl -lcrypto -lpthread -ldl" +
-                              " -std=c++17";
+                              " -I../duckdb/src/include" + " " + lib_group +
+                              " -lssl -lcrypto -lpthread -ldl" + " -std=c++17";
 
     if (std::system(compile_cmd.c_str()) != 0) {
       std::cerr << "Compilation failed: " << name << "\n";
