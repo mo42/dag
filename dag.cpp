@@ -211,8 +211,12 @@ int cmd_compile(const fs::path& dir) {
     std::string lib_group =
         "-Wl,--start-group " + duckdb_libs + " -Wl,--end-group";
     std::string compile_cmd = "g++ " + name + ".cpp -o " + name +
-                              " -I../duckdb/src/include" + " " + lib_group +
-                              " -lssl -lcrypto -lpthread -ldl" + " -std=c++17";
+                              " -I../duckdb/src/include" +
+                              " -ffunction-sections -fdata-sections" +
+                              " " + lib_group +
+                              " -Wl,--gc-sections,--strip-all" +
+                              " -lssl -lcrypto -lpthread -ldl" +
+                              " -std=c++17";
 
     if (std::system(compile_cmd.c_str()) != 0) {
       std::cerr << "Compilation failed: " << name << "\n";
